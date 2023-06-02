@@ -2,7 +2,50 @@ from tkinter import *
 from tkinter import ttk
 import sqlite3
 
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.platypus import SimpleDocTemplate, Image
+import webbrowser
+
 janela = Tk()
+
+class Relatorios:
+    def abrir_pdf(self):
+        webbrowser.open('cliente.pdf')
+
+    def gerar_relatorio(self):
+        self.c = canvas.Canvas('cliente.pdf')
+
+        self.cpfRelatorio = self.campo_cpf.get()
+        self.nomeRelatorio = self.campo_nome.get()
+        self.telefoneRelatorio = self.campo_telefone.get()
+        self.cidadeRelatorio = self.campo_cidade.get()
+
+        self.c.setFont('Helvetica-Bold', 24)
+        self.c.drawString(200, 790, 'Ficha do Cliente')
+
+        self.c.setFont('Helvetica-Bold', 18)
+        self.c.drawString(50, 700, 'CPF: ')
+        self.c.drawString(50, 670, 'Nome: ')
+        self.c.drawString(50, 640, 'Telefone: ')
+        self.c.drawString(50, 610, 'Cidade: ')
+
+        self.c.setFont('Helvetica', 18)
+        self.c.drawString(150, 700, self.cpfRelatorio)
+        self.c.drawString(150, 670, self.nomeRelatorio)
+        self.c.drawString(150, 640, self.telefoneRelatorio)
+        self.c.drawString(150, 610, self.cidadeRelatorio)
+
+        self.c.rect(10, 550, 575, 3, fill=True, stroke=False)
+        self.c.rect(200, 100, 200, 1, fill=True, stroke=False)
+        self.c.setFont('Helvetica', 14)
+        self.c.drawString(267, 80, 'Assinatura')
+
+        self.c.showPage()
+        self.c.save()
+        self.abrir_pdf()
 
 class Funcoes:
     def limpar_campos(self):
@@ -30,12 +73,15 @@ class Funcoes:
         ''')
         self.conectar.commit(); print('Banco de dados criado')
         self.desconectar_bd()
-
-    def cadastrar(self):
+    
+    def variaveis(self):
         self.cpf = self.campo_cpf.get()
         self.nome = self.campo_nome.get()
         self.telefone = self.campo_telefone.get()
         self.cidade = self.campo_cidade.get()
+
+    def cadastrar(self):
+        self.variaveis()
         self.conectar_bd()
 
         self.cursor.execute(''' INSERT INTO clientes (cpf, nome_cliente, telefone, cidade)
@@ -54,7 +100,37 @@ class Funcoes:
             self.lista_clientes.insert('', END, values=i)
         self.desconectar_bd()
 
-class Interface(Funcoes):
+    def double_click(self, envent):
+        self.limpar_campos()
+        self.lista_clientes.selection()
+
+        for n in self.lista_clientes.selection():
+            col1, col2, col3, col4 = self.lista_clientes.item(n, 'values')
+            self.campo_cpf.insert(END, col1)
+            self.campo_nome.insert(END, col2)
+            self.campo_telefone.insert(END, col3)
+            self.campo_cidade.insert(END, col4)
+
+    def deletar_cliente(self):
+        self.variaveis()
+        self.conectar_bd()
+        self.cursor.execute('''DELETE FROM clientes WHERE cpf = ? ''', (self.cpf,))
+        self.conectar.commit()
+        self.desconectar_bd()
+        self.limpar_campos()
+        self.select_lista()
+
+    def alterar_info(self):
+        self.variaveis()
+        self.conectar_bd()
+        self.cursor.execute(''' UPDATE clientes SET nome_cliente = ?, telefone = ?, cidade = ?
+            WHERE cpf = ?''', (self.nome, self.telefone, self.cidade, self.cpf))
+        self.conectar.commit()
+        self.desconectar_bd()
+        self.select_lista()
+        self.limpar_campos()
+
+class Interface(Funcoes, Relatorios):
     def __init__(self):
         self.janela = janela
         self.tela()
@@ -65,6 +141,10 @@ class Interface(Funcoes):
         self.lista()
         self.montar_tabela()
         self.select_lista()
+        self.double_click(Event)
+        self.deletar_cliente()
+        self.alterar_info()
+        self.menus()
         janela.mainloop()
 
     def tela(self):
@@ -81,11 +161,11 @@ class Interface(Funcoes):
         self.frame2.place(relx=0.57,rely=0.89, relheight=0.07, relwidth=0.4)
 
     def botoes(self):
-        self.botao_deletar = Button(self.frame2, text='Deletar', bd=4, bg='#003060', fg='white', font=('verdana', 12))
+        self.botao_deletar = Button(self.frame2, text='Deletar', bd=4, bg='#003060', fg='white', font=('verdana', 12), command=self.deletar_cliente)
         self.botao_deletar.place(relx=0.05,rely=0.2,relwidth=0.3, relheight=0.6)
 
-        self.botao_buscar = Button(self.frame2, text='Buscar', bd=4, bg='#003060', fg='white', font=('verdana', 12))
-        self.botao_buscar.place(relx=0.65,rely=0.2,relwidth=0.3, relheight=0.6)  
+        self.botao_alterar = Button(self.frame2, text='Alterar', bd=4, bg='#003060', fg='white', font=('verdana', 12), command=self.alterar_info)
+        self.botao_alterar.place(relx=0.65,rely=0.2,relwidth=0.3, relheight=0.6)  
 
         self.botao_novo = Button(self.janela, text='Novo', bd=4, bg='#007500', fg='white',font=('verdana', 12), command=self.cadastrar)
         self.botao_novo.place(relx=0.18,rely=0.5,relwidth=0.07, relheight=0.03)
@@ -139,5 +219,21 @@ class Interface(Funcoes):
         self.barra_rolagem = Scrollbar(self.frame1, orient='vertical')
         self.lista_clientes.configure(yscroll=self.barra_rolagem.set)
         self.barra_rolagem.place(relx=0.0001, rely=0.001, relheight=0.935, relwidth=0.04)
+        self.lista_clientes.bind('<Double-1>', self.double_click)
+
+    def menus(self):
+        barra_menu = Menu(self.janela)
+        self.janela.config(menu=barra_menu)
+        arquivo_menu = Menu(barra_menu)
+        arquivo_menu2 = Menu(barra_menu)
+        
+        def quit(): self.janela.destroy()
+
+        barra_menu.add_cascade(label = 'Opções', menu = arquivo_menu)
+        barra_menu.add_cascade(label = 'Relatórios', menu = arquivo_menu2)
+
+        arquivo_menu.add_cascade(label = 'Encerrar o programa', command=quit)
+        arquivo_menu2.add_cascade(label = 'Ficha do Cliente', command=self.gerar_relatorio)
+
 
 Interface()
