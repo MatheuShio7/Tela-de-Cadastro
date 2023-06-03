@@ -38,10 +38,22 @@ class Relatorios:
         self.c.drawString(150, 640, self.telefoneRelatorio)
         self.c.drawString(150, 610, self.cidadeRelatorio)
 
+
         self.c.rect(10, 550, 575, 3, fill=True, stroke=False)
-        self.c.rect(200, 100, 200, 1, fill=True, stroke=False)
+
+        self.c.rect(30, 500, 535, 1, fill=True, stroke= False)
+        self.c.rect(30, 470, 535, 1, fill=True, stroke= False)
+        self.c.rect(30, 440, 535, 1, fill=True, stroke= False)
+        self.c.rect(30, 410, 535, 1, fill=True, stroke= False)
+        self.c.rect(30, 380, 535, 1, fill=True, stroke= False)
+        self.c.rect(30, 350, 535, 1, fill=True, stroke= False)
+        self.c.rect(30, 320, 535, 1, fill=True, stroke= False)
+
+        self.c.rect(200, 290, 200, 6, fill=False, stroke=True)
+
+        self.c.rect(200, 50, 200, 1, fill=True, stroke=False)
         self.c.setFont('Helvetica', 14)
-        self.c.drawString(267, 80, 'Assinatura')
+        self.c.drawString(267, 30, 'Assinatura')
 
         self.c.showPage()
         self.c.save()
