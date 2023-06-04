@@ -49,7 +49,7 @@ class Relatorios:
         self.c.rect(30, 350, 535, 1, fill=True, stroke= False)
         self.c.rect(30, 320, 535, 1, fill=True, stroke= False)
 
-        self.c.rect(200, 290, 200, 6, fill=False, stroke=True)
+        self.c.rect(147, 125, 300, 160, fill=False, stroke=True)
 
         self.c.rect(200, 50, 200, 1, fill=True, stroke=False)
         self.c.setFont('Helvetica', 14)
