@@ -73,6 +73,13 @@ class Funcoes:
     
     def desconectar_bd(self):
         self.conectar.close(); print('Desconectando do banco de dados')
+    
+    def variaveis(self):
+        self.code = self.campo_code.get()
+        self.cpf = self.campo_cpf.get()
+        self.nome = self.campo_nome.get()
+        self.telefone = self.campo_telefone.get()
+        self.cidade = self.campo_cidade.get()
 
     def montar_tabela(self):
         self.conectar_bd()
@@ -85,16 +92,9 @@ class Funcoes:
                 cidade CHAR(40)
             );
         ''')
-        self.conectar.commit(); print('Banco de dados criado')
+        self.conectar.commit(); print('Banco de dados criado') 
         self.desconectar_bd()
     
-    def variaveis(self):
-        self.code = self.campo_code.get()
-        self.cpf = self.campo_cpf.get()
-        self.nome = self.campo_nome.get()
-        self.telefone = self.campo_telefone.get()
-        self.cidade = self.campo_cidade.get()
-
     def cadastrar(self):
         self.variaveis()
         self.conectar_bd()
