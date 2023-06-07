@@ -129,7 +129,7 @@ class Funcoes:
     def deletar_cliente(self):
         self.variaveis()
         self.conectar_bd()
-        self.cursor.execute('''DELETE FROM clientes_code WHERE cpf = ? ''', (self.cpf,))
+        self.cursor.execute('''DELETE FROM clientes_code WHERE code = ? ''', (self.code,))
         self.conectar.commit()
         self.desconectar_bd()
         self.limpar_campos()
@@ -255,7 +255,7 @@ class Interface(Funcoes, Relatorios):
         barra_menu.add_cascade(label = 'Opções', menu = arquivo_menu)
         barra_menu.add_cascade(label = 'Relatórios', menu = arquivo_menu2)
 
-        arquivo_menu.add_cascade(label = 'Encerrar o programa', command=quit)
+        arquivo_menu.add_cascade(label = 'Fechar o programa', command=quit)
         arquivo_menu2.add_cascade(label = 'Ficha do Cliente', command=self.gerar_relatorio)
 
 
