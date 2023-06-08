@@ -97,21 +97,26 @@ class Funcoes:
     
     def cadastrar(self):
         self.variaveis()
-        self.conectar_bd()
-        self.cursor.execute(''' INSERT INTO clientes_code (cpf, nome_cliente, telefone, cidade)
-            VALUES (?, ?, ?, ?)''', (self.cpf, self.nome, self.telefone, self.cidade))
-        self.conectar.commit()
-        self.desconectar_bd()
-        self.select_lista()
-        self.limpar_campos()
+        if self.nome and self.cpf and self.telefone and self.cidade:  
+            self.conectar_bd()
+
+            self.cursor.execute(''' INSERT INTO clientes_code (cpf, nome_cliente, telefone, cidade)
+                VALUES (?, ?, ?, ?)''', (self.cpf, self.nome, self.telefone, self.cidade))
+            self.conectar.commit()
+
+            self.desconectar_bd()
+            self.select_lista()
+            self.limpar_campos()
 
     def select_lista(self):
         self.lista_clientes.delete(*self.lista_clientes.get_children())
         self.conectar_bd()
+
         lista = self.cursor.execute(''' SELECT code, cpf, nome_cliente, telefone, cidade FROM clientes_code
             ORDER BY nome_cliente ASC; ''')
         for i in lista:
             self.lista_clientes.insert('', END, values=i)
+
         self.desconectar_bd()
 
     def double_click(self, envent):
@@ -129,8 +134,10 @@ class Funcoes:
     def deletar_cliente(self):
         self.variaveis()
         self.conectar_bd()
+
         self.cursor.execute('''DELETE FROM clientes_code WHERE code = ? ''', (self.code,))
         self.conectar.commit()
+
         self.desconectar_bd()
         self.limpar_campos()
         self.select_lista()
@@ -138,12 +145,31 @@ class Funcoes:
     def alterar_info(self):
         self.variaveis()
         self.conectar_bd()
+
         self.cursor.execute(''' UPDATE clientes_code SET cpf = ?, nome_cliente = ?, telefone = ?, cidade = ?
             WHERE code = ?''', (self.cpf, self.nome, self.telefone, self.cidade, self.code))
         self.conectar.commit()
+
         self.desconectar_bd()
         self.select_lista()
         self.limpar_campos()
+
+    def buscar_cliente(self):
+        self.conectar_bd()
+        self.lista_clientes.delete(*self.lista_clientes.get_children())
+        self.campo_nome.insert(END, '%')
+
+        nome = '%' + self.campo_nome.get() + '%'
+        self.cursor.execute(
+            ''' SELECT code, nome_cliente, cpf, telefone, cidade FROM clientes_code
+            WHERE nome_cliente LIKE ? ORDER BY nome_cliente ASC''', (nome,))
+        busca_nome = self.cursor.fetchall()
+
+        for i in busca_nome:
+            self.lista_clientes.insert('', END, values=i)
+
+        self.limpar_campos()
+        self.desconectar_bd()
 
 class Interface(Funcoes, Relatorios):
     def __init__(self):
@@ -159,6 +185,7 @@ class Interface(Funcoes, Relatorios):
         self.double_click(Event)
         self.deletar_cliente()
         self.alterar_info()
+        self.buscar_cliente()
         self.menus()
         janela.mainloop()
 
@@ -177,11 +204,14 @@ class Interface(Funcoes, Relatorios):
 
     def botoes(self):
         self.botao_deletar = Button(self.frame2, text='Deletar', bd=4, bg='#003060', fg='white', font=('verdana', 12), command=self.deletar_cliente)
-        self.botao_deletar.place(relx=0.05,rely=0.2,relwidth=0.3, relheight=0.6)
+        self.botao_deletar.place(relx=0.05,rely=0.2,relwidth=0.28, relheight=0.6)
 
         self.botao_alterar = Button(self.frame2, text='Alterar', bd=4, bg='#003060', fg='white', font=('verdana', 12), command=self.alterar_info)
-        self.botao_alterar.place(relx=0.65,rely=0.2,relwidth=0.3, relheight=0.6)  
-
+        self.botao_alterar.place(relx=0.67,rely=0.2,relwidth=0.28, relheight=0.6)  
+        
+        self.botao_buscar = Button(self.frame2, text='Buscar', bd=4, bg='#003060', fg='white', font=('verdana', 12), command=self.buscar_cliente)
+        self.botao_buscar.place(relx=0.36,rely=0.2,relwidth=0.28, relheight=0.6)
+        
         self.botao_novo = Button(self.janela, text='Novo', bd=4, bg='#007500', fg='white',font=('verdana', 12), command=self.cadastrar)
         self.botao_novo.place(relx=0.18,rely=0.5,relwidth=0.07, relheight=0.03)
 
