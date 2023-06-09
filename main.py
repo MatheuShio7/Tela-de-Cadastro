@@ -27,14 +27,14 @@ class Relatorios:
         self.c.drawString(200, 790, 'Ficha do Cliente')
 
         self.c.setFont('Helvetica-Bold', 18)
-        self.c.drawString(50, 700, 'CPF: ')
-        self.c.drawString(50, 670, 'Nome: ')
+        self.c.drawString(50, 700, 'Nome: ')
+        self.c.drawString(50, 670, 'CPF: ')
         self.c.drawString(50, 640, 'Telefone: ')
         self.c.drawString(50, 610, 'Cidade: ')
 
         self.c.setFont('Helvetica', 18)
-        self.c.drawString(150, 700, self.cpfRelatorio)
-        self.c.drawString(150, 670, self.nomeRelatorio)
+        self.c.drawString(150, 700, self.nomeRelatorio)
+        self.c.drawString(150, 670, self.cpfRelatorio)
         self.c.drawString(150, 640, self.telefoneRelatorio)
         self.c.drawString(150, 610, self.cidadeRelatorio)
 
@@ -76,8 +76,8 @@ class Funcoes:
     
     def variaveis(self):
         self.code = self.campo_code.get()
-        self.cpf = self.campo_cpf.get()
         self.nome = self.campo_nome.get()
+        self.cpf = self.campo_cpf.get()
         self.telefone = self.campo_telefone.get()
         self.cidade = self.campo_cidade.get()
 
@@ -97,7 +97,7 @@ class Funcoes:
     
     def cadastrar(self):
         self.variaveis()
-        if self.nome and self.cpf and self.telefone and self.cidade:  
+        if self.cpf and self.nome and self.telefone and self.cidade:  
             self.conectar_bd()
 
             self.cursor.execute(''' INSERT INTO clientes_code (cpf, nome_cliente, telefone, cidade)
@@ -107,17 +107,6 @@ class Funcoes:
             self.desconectar_bd()
             self.select_lista()
             self.limpar_campos()
-
-    def select_lista(self):
-        self.lista_clientes.delete(*self.lista_clientes.get_children())
-        self.conectar_bd()
-
-        lista = self.cursor.execute(''' SELECT code, cpf, nome_cliente, telefone, cidade FROM clientes_code
-            ORDER BY nome_cliente ASC; ''')
-        for i in lista:
-            self.lista_clientes.insert('', END, values=i)
-
-        self.desconectar_bd()
 
     def double_click(self, envent):
         self.limpar_campos()
@@ -131,17 +120,6 @@ class Funcoes:
             self.campo_telefone.insert(END, col4)
             self.campo_cidade.insert(END, col5)
 
-    def deletar_cliente(self):
-        self.variaveis()
-        self.conectar_bd()
-
-        self.cursor.execute('''DELETE FROM clientes_code WHERE code = ? ''', (self.code,))
-        self.conectar.commit()
-
-        self.desconectar_bd()
-        self.limpar_campos()
-        self.select_lista()
-
     def alterar_info(self):
         self.variaveis()
         self.conectar_bd()
@@ -154,6 +132,28 @@ class Funcoes:
         self.select_lista()
         self.limpar_campos()
 
+    def deletar_cliente(self):
+        self.variaveis()
+        self.conectar_bd()
+
+        self.cursor.execute('''DELETE FROM clientes_code WHERE code = ? ''', (self.code,))
+        self.conectar.commit()
+
+        self.desconectar_bd()
+        self.limpar_campos()
+        self.select_lista()
+
+    def select_lista(self):
+            self.lista_clientes.delete(*self.lista_clientes.get_children())
+            self.conectar_bd()
+
+            lista = self.cursor.execute(''' SELECT code, cpf, nome_cliente, telefone, cidade FROM clientes_code
+                ORDER BY nome_cliente ASC; ''')
+            for i in lista:
+                self.lista_clientes.insert('', END, values=i)
+
+            self.desconectar_bd()
+
     def buscar_cliente(self):
         self.conectar_bd()
         self.lista_clientes.delete(*self.lista_clientes.get_children())
@@ -161,7 +161,7 @@ class Funcoes:
 
         nome = '%' + self.campo_nome.get() + '%'
         self.cursor.execute(
-            ''' SELECT code, nome_cliente, cpf, telefone, cidade FROM clientes_code
+            ''' SELECT code, cpf, nome_cliente, telefone, cidade FROM clientes_code
             WHERE nome_cliente LIKE ? ORDER BY nome_cliente ASC''', (nome,))
         busca_nome = self.cursor.fetchall()
 
