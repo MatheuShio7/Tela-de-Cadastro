@@ -192,8 +192,10 @@ class Interface(Funcoes, Relatorios):
 
     def tela(self):
         self.janela.title('Cadastro de Clientes')
+        largura = self.janela.winfo_screenwidth()
+        altura = self.janela.winfo_screenheight()
+        self.janela.geometry(f'{largura}x{altura}')
         self.janela.configure(background='#003060')
-        self.janela.geometry('1500x900')
         self.janela.resizable(True, True) #permitir que o usuário diminua a tela, tanto verticalmente como horizontalmente.
 
     def frames(self):
