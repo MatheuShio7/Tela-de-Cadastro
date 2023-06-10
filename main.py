@@ -8,6 +8,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import SimpleDocTemplate, Image
 import webbrowser
+from PIL import ImageTk, Image
 
 janela = Tk()
 
@@ -202,20 +203,27 @@ class Interface(Funcoes, Relatorios):
         self.frame2 = Frame(self.janela, bg='#c0c0c0', highlightbackground='black', highlightthickness=3)
         self.frame2.place(relx=0.57,rely=0.89, relheight=0.07, relwidth=0.4)
 
+        self.abrir_logo = Image.open('logo.png')
+        self.logo_medido = self.abrir_logo.resize((250, 250))
+        self.tk_logo = ImageTk.PhotoImage(self.logo_medido)
+
+        self.imagem_logo = Label(janela, image=self.tk_logo)
+        self.imagem_logo.place(relx=0.21, rely=0.6)
+
     def botoes(self):
-        self.botao_deletar = Button(self.frame2, text='Deletar', bd=4, bg='#003060', fg='white', font=('verdana', 12), command=self.deletar_cliente)
+        self.botao_deletar = Button(self.frame2, text='Deletar', bd=4, bg='#003060', fg='white', activebackground='#145DA0', activeforeground='white', font=('verdana', 12),  command=self.deletar_cliente)
         self.botao_deletar.place(relx=0.05,rely=0.2,relwidth=0.28, relheight=0.6)
 
-        self.botao_alterar = Button(self.frame2, text='Alterar', bd=4, bg='#003060', fg='white', font=('verdana', 12), command=self.alterar_info)
+        self.botao_alterar = Button(self.frame2, text='Alterar', bd=4, bg='#003060', fg='white', activebackground='#145DA0', activeforeground='white', font=('verdana', 12), command=self.alterar_info)
         self.botao_alterar.place(relx=0.67,rely=0.2,relwidth=0.28, relheight=0.6)  
         
-        self.botao_buscar = Button(self.frame2, text='Buscar', bd=4, bg='#003060', fg='white', font=('verdana', 12), command=self.buscar_cliente)
+        self.botao_buscar = Button(self.frame2, text='Buscar', bd=4, bg='#003060', fg='white', activebackground='#145DA0', activeforeground='white', font=('verdana', 12), command=self.buscar_cliente)
         self.botao_buscar.place(relx=0.36,rely=0.2,relwidth=0.28, relheight=0.6)
         
-        self.botao_novo = Button(self.janela, text='Novo', bd=4, bg='#007500', fg='white',font=('verdana', 12), command=self.cadastrar)
+        self.botao_novo = Button(self.janela, text='Novo', bd=4, bg='#1D741B', fg='white', activebackground='#59981A', activeforeground='white', font=('verdana', 12), command=self.cadastrar)
         self.botao_novo.place(relx=0.18,rely=0.5,relwidth=0.07, relheight=0.03)
 
-        self.botao_limpar = Button(self.janela, text='Limpar', bd=4, bg='#750000', fg='white', font=('verdana', 12), command=self.limpar_campos)
+        self.botao_limpar = Button(self.janela, text='Limpar', bd=4, bg='#750000', fg='white', activebackground='#FF2E2E', activeforeground='white', font=('verdana', 12), command=self.limpar_campos)
         self.botao_limpar.place(relx=0.3,rely=0.5,relwidth=0.07, relheight=0.03)
 
     def textos(self):
